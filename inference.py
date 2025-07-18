@@ -12,10 +12,11 @@ def preprocessing_pipeline(df):
     
     return df
 
-def load_model():
+def load_model(category):
     with open(f'ModelTraining/{category}_model.pkl', 'rb') as file:
-        model, features = pickle.load(file)
-    return model, features
+        model = pickle.load(file)
+        print(type(model))
+    return model
 
 def app(): 
     st.title('Sales Volume Forecasting')
@@ -26,19 +27,21 @@ def app():
     start_date = st.date_input('Start Date')
     end_date = st.date_input('End Date')
     
-    df = pd.DataFrame({'ds':pd.date_range(start=start_date, end=end_date, freq='M')})
+    df = pd.DataFrame({'ds':pd.date_range(start_date, end_date)})
     
     df = preprocessing_pipeline(df)
     
-    model,features = load_model(category)
+    model = load_model(category)
+    print("this is the dataframe:", df)
+    if df.empty:
+        st.write("Please select a valid date range.")
+    else:
+        prediction = model.predict(df)
+        predict_plot = prediction[['ds', 'yhat']]
+        st.line_chart(predict_plot, x = 'ds', y = 'yhat')
     
-    prediction = model.predict(df)
-    
-    predict_plot = prediction[['ds', 'yhat']]
-    st.line_chart(predict_plot, x = 'ds', y = 'yhat')
-    
-    if __name__ == '__main__':
-        app()
+if __name__ == '__main__':
+    app()
         
 # This code is a Streamlit application that allows users to select a product category and date range to forecast sales volume using a pre-trained model.
 # It includes functions for preprocessing the data, loading the model, and displaying the results in a line chart.
