@@ -1,48 +1,54 @@
-import streamlit as st 
+import streamlit as st
 import pandas as pd
 import pickle
 
+
 def preprocessing_pipeline(df):
-   # """Preprocesses the input DataFrame."""
-    df['ds'] = pd.to_datetime(df['ds'])
-    
-    df['ds'] = df['ds'].dt.to_period('M')
-    
-    df['ds'] = df['ds'].dt.to_timestamp()
-    
+    # """Preprocesses the input DataFrame."""
+    df["ds"] = pd.to_datetime(df["ds"])
+
+    df["ds"] = df["ds"].dt.to_period("M")
+
+    df["ds"] = df["ds"].dt.to_timestamp()
+
     return df
 
+
 def load_model(category):
-    with open(f'ModelTraining/{category}_model.pkl', 'rb') as file:
+    with open(f"ModelTraining/{category}_model.pkl", "rb") as file:
         model = pickle.load(file)
         print(type(model))
     return model
 
-def app(): 
-    st.title('Sales Volume Forecasting')
-    st.write('Select a category of product to make predictions')
-    
-    category = st.selectbox('Category', ['Accessories', 'Laptop', 'Smartphone', 'Tablet'])
-    
-    start_date = st.date_input('Start Date')
-    end_date = st.date_input('End Date')
-    
-    df = pd.DataFrame({'ds':pd.date_range(start_date, end_date)})
-    
+
+def app():
+    st.title("Sales Volume Forecasting")
+    st.write("Select a category of product to make predictions")
+
+    category = st.selectbox(
+        "Category", ["Accessories", "Laptop", "Smartphone", "Tablet"]
+    )
+
+    start_date = st.date_input("Start Date")
+    end_date = st.date_input("End Date")
+
+    df = pd.DataFrame({"ds": pd.date_range(start_date, end_date)})
+
     df = preprocessing_pipeline(df)
-    
+
     model = load_model(category)
     print("this is the dataframe:", df)
     if df.empty:
         st.write("Please select a valid date range.")
     else:
         prediction = model.predict(df)
-        predict_plot = prediction[['ds', 'yhat']]
-        st.line_chart(predict_plot, x = 'ds', y = 'yhat')
-    
-if __name__ == '__main__':
+        predict_plot = prediction[["ds", "yhat"]]
+        st.line_chart(predict_plot, x="ds", y="yhat")
+
+
+if __name__ == "__main__":
     app()
-        
+
 # This code is a Streamlit application that allows users to select a product category and date range to forecast sales volume using a pre-trained model.
 # It includes functions for preprocessing the data, loading the model, and displaying the results in a line chart.
 # The application is designed to be run as a standalone script, and it uses the Streamlit library for the user interface.
@@ -110,5 +116,4 @@ if __name__ == '__main__':
 # By providing a shared platform for making predictions and visualizing results, team members can work together more effectively to analyze sales trends and develop strategies for improving sales performance.
 # This can lead to better communication and collaboration within the team, resulting in more informed decision-making and improved sales outcomes.
 # The application can also be used to educate users about the importance of data-driven decision-making in sales and marketing.
-# By providing a practical example of how machine learning can be applied to sales forecasting, users can gain a better understanding of the value of leveraging data   
-        
+# By providing a practical example of how machine learning can be applied to sales forecasting, users can gain a better understanding of the value of leveraging data
